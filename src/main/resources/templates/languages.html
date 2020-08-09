@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Link kezelő: Nyelvek</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<p style="font-size: 1.5em;">Nyelvek</p>
+<table>
+    <thead>
+    <tr>
+        <th><strong>Nyelv</strong></th>
+        <th><strong>T&ouml;rl&eacute;s</strong></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="language : ${languages}">
+        <td th:text="${language.name}">Angol</td>
+        <td style="text-align: center;"><a th:href="@{/languages/{languageName}/delete(languageName=${language.name})}">X</a></td>
+    </tr>
+    </tbody>
+</table>
+<p style="font-size: 1.5em;">Új Nyelv hozzáadaása</p>
+<form action="#" th:action="@{/languages}" th:object="${newLanguage}" method="post">
+    <p>Név: <input type="text" th:field="*{name}"></p>
+    <p><input type="submit" value="Beküld"/></p>
+</form>
+</body>
+</html>

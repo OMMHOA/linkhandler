@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Link kezelő: Tanárok</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+<body>
+<p style="font-size: 1.5em;">Tanárok</p>
+<table>
+    <thead>
+    <tr>
+        <th><strong>Tanár</strong></th>
+        <th><strong>Tel</strong></th>
+        <th><strong>E-mail</strong></th>
+        <th><strong>Nyelvek</strong></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="teacher : ${teachers}">
+        <td th:text="${teacher.name}">Jakab Bianka</td>
+        <td th:text="${teacher.telNum}">07 21 123 456</td>
+        <td th:text="${teacher.email}">jakab.biank@email.com</td>
+        <td th:each="language : ${teacher.languages}">
+            <div th:text="${language.name}">Magyar</div>
+        </td>
+        <td style="text-align: center;"><a th:href="@{/teachers/{teacherName}/delete(teacherName=${teacher.name})}">X</a></td>
+    </tr>
+    </tbody>
+</table>
+<p style="font-size: 1.5em;">Új Tanár hozzáadaása</p>
+<form action="#" th:action="@{/teachers}" th:object="${newTeacher}" method="post">
+    <p>Név: <input type="text" th:field="*{name}"></p>
+    <p>Tel: <input type="text" th:field="*{telNum}"></p>
+    <p>Email: <input type="text" th:field="*{email}"></p>
+    <p>Nyelvek:
+        <tr th:each="language : ${languages}">
+            <td th:text="${language.name}">Magyar</td>
+            <td><input name="languages" th:value="${language.name}" type="checkbox"></td>
+        </tr>
+    </p>
+    <p><input type="submit" value="Beküld"/></p>
+</form>
+</body>
+</html>
