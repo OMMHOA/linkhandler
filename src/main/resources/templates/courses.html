@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Link Kezelő: Kurzusok</title>
@@ -9,12 +9,55 @@
 <table>
     <thead>
     <tr>
-        <th></th>
+        <th><strong>Tanár</strong></th>
+        <th><strong>Nyelv</strong></th>
+        <th><strong>Órák száma</strong></th>
+        <th><strong>Kezdés</strong></th>
+        <th><strong>Végzés</strong></th>
+        <th><strong>Órabér</strong></th>
+        <th><strong>Járulék</strong></th>
+        <th><strong>Szint</strong></th>
+        <th><strong>Törlés</strong></th>
     </tr>
     </thead>
     <tbody>
-
+    <tr th:each="course : ${courses}">
+        <td th:text="${course.teacher.name}">Példa Név</td>
+        <td th:text="${course.language.name}">Magyar</td>
+        <td th:text="${course.totalHours}">30</td>
+        <td th:text="${course.startDate.getYear() + 1900} + '.' + ${course.startDate.getMonth() + 1} + '.' + ${course.startDate.getDate()}">2020.03.15.</td>
+        <td th:text="${course.endDate.getYear() + 1900} + '.' + ${course.endDate.getMonth() + 1} + '.' + ${course.endDate.getDate()}">2020.05.15.</td>
+        <td th:text="${course.hourlyWage}">35</td>
+        <td th:text="${course.contribution}">10</td>
+        <td th:text="${course.level}">B1</td>
+        <td style="text-align: center;"><a th:href="@{/courses/{courseUuid}/delete(courseUuid=${course.uuid})}">X</a></td>
+    </tr>
     </tbody>
 </table>
+<p style="font-size: 1.5em;">Új Kurzus hozzáadaása</p>
+<form action="#" th:action="@{/courses}" th:object="${newCourse}" method="post">
+    <p><label for="teacher">Tanár:</label>
+        <select id="teacher" th:field="*{teacher}">
+            <option th:each="t : ${teachers}" name="teacher" th:value="${t.name}" th:text="${t.name}"></option>
+        </select>
+    </p>
+    <p>Nyelv:
+        <tr th:each="language : ${languages}">
+            <td th:text="${language.name}">Magyar</td>
+            <td><input name="language" th:value="${language.name}" type="radio"></td>
+        </tr>
+    </p>
+    <p>Órák száma: <input type="text" th:field="*{totalHours}"></p>
+    <p>Kezdés: <input type="date" th:field="*{startDate}"></p>
+    <p>Végzés: <input type="date" th:field="*{endDate}"></p>
+    <p>Órabér: <input type="text" th:field="*{hourlyWage}"></p>
+    <p>Járulék: <input type="text" th:field="*{contribution}"></p>
+    <p><label for="level">Szint:</label>
+        <select id="level" name="level" th:field="*{level}">
+            <option th:each="l : ${levels}" th:value="${l}" th:text="${l}"></option>
+        </select>
+    </p>
+    <p><input type="submit" value="Beküld"/></p>
+</form>
 </body>
 </html>
