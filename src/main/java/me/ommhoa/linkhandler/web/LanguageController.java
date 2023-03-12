@@ -3,6 +3,8 @@ package me.ommhoa.linkhandler.web;
 import com.google.common.collect.ImmutableList;
 import me.ommhoa.linkhandler.model.Language;
 import me.ommhoa.linkhandler.repository.LanguageRepository;
+import me.ommhoa.linkhandler.service.LanguageService;
+import me.ommhoa.linkhandler.view.LanguageView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,25 +19,30 @@ import java.util.List;
 public class LanguageController {
 
     @Autowired
-    private LanguageRepository languageRepository;
+    private LanguageService languageService;
+
+    @Autowired
+    private LanguageView languageView;
 
     @GetMapping("/languages")
     public String getLanguages(Model model) {
-        List<Language> languages = ImmutableList.copyOf(languageRepository.findAll());
-        model.addAttribute("languages", languages);
-        model.addAttribute("newLanguage", new Language());
-        return "languages";
+        return languageView.renderPage(
+                model,
+                new LanguageView.Parameters()
+                        .setNewLanguage(new Language())
+                        .setLanguages(languageService.getLanguages())
+        );
     }
 
     @PostMapping("/languages")
     public String addLanguage(@ModelAttribute Language language) {
-        languageRepository.save(language);
+        languageService.saveLanguage(language);
         return "redirect:/languages";
     }
 
     @GetMapping("/languages/{language}/delete")
     public String deleteLanguage(@PathVariable String language) {
-        languageRepository.delete(new Language(language));
+        languageService.deleteLanguageByName(language);
         return "redirect:/languages";
     }
 }
