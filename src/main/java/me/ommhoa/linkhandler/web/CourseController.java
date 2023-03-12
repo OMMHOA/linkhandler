@@ -1,12 +1,12 @@
 package me.ommhoa.linkhandler.web;
 
-import com.google.common.collect.ImmutableList;
 import me.ommhoa.linkhandler.model.Course;
 import me.ommhoa.linkhandler.model.LanguageLevel;
 import me.ommhoa.linkhandler.model.Teacher;
-import me.ommhoa.linkhandler.repository.CourseRepository;
-import me.ommhoa.linkhandler.repository.LanguageRepository;
-import me.ommhoa.linkhandler.repository.TeacherRepository;
+import me.ommhoa.linkhandler.service.CourseService;
+import me.ommhoa.linkhandler.service.LanguageService;
+import me.ommhoa.linkhandler.service.TeacherService;
+import me.ommhoa.linkhandler.view.CourseView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,49 +17,49 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Controller
 public class CourseController {
     private static final Logger logger = LoggerFactory.getLogger(CourseController.class);
 
     @Autowired
-    private CourseRepository courseRepository;
+    private CourseService courseService;
 
     @Autowired
-    private LanguageRepository languageRepository;
+    private LanguageService languageService;
 
     @Autowired
-    private TeacherRepository teacherRepository;
+    private TeacherService teacherService;
+
+    @Autowired
+    private CourseView courseView;
 
     @GetMapping("/courses")
-    public String getLanguages(Model model) {
-        List<Course> courses = ImmutableList.copyOf(courseRepository.findAll());
-        model.addAttribute("courses", courses);
+    public String getCourses(Model model) {
         Course course = new Course();
         course.setTeacher(new Teacher());
-        model.addAttribute("newCourse", course);
-        model.addAttribute("languages", languageRepository.findAll());
-        model.addAttribute("teachers", teacherRepository.findAll());
-        model.addAttribute("levels", LanguageLevel.values());
-        return "courses";
+        return courseView.renderPage(
+                model,
+                new CourseView.Parameters()
+                        .setNewCourse(course)
+                        .setCourses(courseService.getCourses())
+                        .setLanguages(languageService.getLanguages())
+                        .setTeachers(teacherService.getTeachers())
+                        .setLanguageLevels(LanguageLevel.values())
+        );
     }
 
     @PostMapping("/courses")
-    public String addLanguage(@ModelAttribute Course course) {
+    public String addCourse(@ModelAttribute Course course) {
         course.setUuid(UUID.randomUUID());
-        logger.info(course.toString());
-        courseRepository.save(course);
-        return "redirect:courses";
+        courseService.saveCourse(course);
+        return "redirect:/courses";
     }
 
     @GetMapping("/courses/{courseUuid}/delete")
-    public String deleteLanguage(@PathVariable String courseUuid) {
-        Course course = courseRepository.findByUuid(UUID.fromString(courseUuid));
-        courseRepository.delete(course);
+    public String deleteCourse(@PathVariable String courseUuid) {
+        courseService.deleteCourseByUuid(courseUuid);
         return "redirect:/courses";
     }
 }

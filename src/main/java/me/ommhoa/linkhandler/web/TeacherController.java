@@ -4,6 +4,9 @@ import com.google.common.collect.ImmutableList;
 import me.ommhoa.linkhandler.model.Teacher;
 import me.ommhoa.linkhandler.repository.LanguageRepository;
 import me.ommhoa.linkhandler.repository.TeacherRepository;
+import me.ommhoa.linkhandler.service.LanguageService;
+import me.ommhoa.linkhandler.service.TeacherService;
+import me.ommhoa.linkhandler.view.TeacherView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,29 +21,34 @@ import java.util.List;
 public class TeacherController {
 
     @Autowired
-    private TeacherRepository teacherRepository;
+    private TeacherService teacherService;
 
     @Autowired
-    private LanguageRepository languageRepository;
+    private LanguageService languageService;
+
+    @Autowired
+    private TeacherView teacherView;
 
     @GetMapping("/teachers")
-    public String getLanguages(Model model) {
-        List<Teacher> teachers = ImmutableList.copyOf(teacherRepository.findAll());
-        model.addAttribute("teachers", teachers);
-        model.addAttribute("newTeacher", new Teacher());
-        model.addAttribute("languages", languageRepository.findAll());
-        return "teachers";
+    public String getTeachers(Model model) {
+        return teacherView.renderPage(
+                model,
+                new TeacherView.Parameters()
+                        .setLanguages(languageService.getLanguages())
+                        .setTeachers(teacherService.getTeachers())
+                        .setNewTeacher(new Teacher())
+        );
     }
 
     @PostMapping("/teachers")
-    public String addLanguage(@ModelAttribute Teacher teacher) {
-        teacherRepository.save(teacher);
+    public String addTeacher(@ModelAttribute Teacher teacher) {
+        teacherService.saveTeacher(teacher);
         return "redirect:/teachers";
     }
 
     @GetMapping("/teachers/{teacher}/delete")
-    public String deleteLanguage(@PathVariable String teacher) {
-        teacherRepository.delete(new Teacher(teacher));
+    public String deleteTeacher(@PathVariable String teacherName) {
+        teacherService.deleteTeacherByName(teacherName);
         return "redirect:/teachers";
     }
 }
